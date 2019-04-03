@@ -23,7 +23,7 @@ import com.finja.payrollplus.utilities.NetworkUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.general_custom_dialog_network_error.*
 
-class PayRollActivity : AppCompatActivity() {
+class WebViewActivity : AppCompatActivity() {
 
     private val networkUtils = NetworkUtils()
     private val networkChangeReceiver = NetworkChangeReceiver()
@@ -47,7 +47,7 @@ class PayRollActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (networkUtils.haveNetworkConnection(this@PayRollActivity)) {
+        if (networkUtils.haveNetworkConnection(this@WebViewActivity)) {
             loadWeb(BuildConfig.URL)
         } else {
             imgv_network_error.setVisibility(View.GONE)
@@ -93,7 +93,7 @@ class PayRollActivity : AppCompatActivity() {
      */
     inner class myWebClient : WebViewClient() {
         override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-            if (networkUtils.haveNetworkConnection(this@PayRollActivity)) {
+            if (networkUtils.haveNetworkConnection(this@WebViewActivity)) {
                 imgv_network_error.setVisibility(View.GONE)
                 webView.setVisibility(View.VISIBLE)
                 overlayView.visibility = View.VISIBLE
@@ -107,7 +107,7 @@ class PayRollActivity : AppCompatActivity() {
         }
 
         override fun onPageFinished(view: WebView, url: String) {
-            if (networkUtils.haveNetworkConnection(this@PayRollActivity)) {
+            if (networkUtils.haveNetworkConnection(this@WebViewActivity)) {
                 webView.setVisibility(View.VISIBLE)
                 overlayView.visibility = View.GONE
                 super.onPageFinished(view, url)
@@ -188,7 +188,7 @@ class PayRollActivity : AppCompatActivity() {
         if (webView.canGoBack()) {
             webView.goBack()
         } else {
-            generalDailog("PayrollPlus", "Are you sure you want to quit?")
+            generalDailog(getString(R.string.app_name), "Are you sure you want to quit?")
         }
     }
 
@@ -198,7 +198,7 @@ class PayRollActivity : AppCompatActivity() {
      */
     fun generalDailog(title: String, message: String) {
         try {
-            val builder = AlertDialog.Builder(this@PayRollActivity)
+            val builder = AlertDialog.Builder(this@WebViewActivity)
 
             builder.setTitle(title)
             builder.setMessage(message)
@@ -282,7 +282,6 @@ class PayRollActivity : AppCompatActivity() {
     }
 
     /**
-     * showToast
      */
     private fun showToast(text: String) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show()
