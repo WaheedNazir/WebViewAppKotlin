@@ -66,7 +66,7 @@ class WebViewActivity : AppCompatActivity() {
         webSettings.setBuiltInZoomControls(false)
         webView.setWebViewClient(myWebClient())
         webView.setWebChromeClient(MyWebChromeClient())
-        /*webView.addJavascriptInterface(JavaScriptHandler(), getString(R.string.myhandler))*/
+        webView.addJavascriptInterface(JavaScriptHandler(), "Your_Handler_NAME")
         try {
             webView.loadData("", "text/html", null)
             webView.loadUrl(url)
@@ -156,29 +156,14 @@ class WebViewActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     *
-     */
-    /*inner class JavaScriptHandler internal constructor() {
+
+    class JavaScriptHandler internal constructor() {
 
         @JavascriptInterface
         fun setResult(value: String?, msg: String, status: String) {
-
-            if (status.equals("success", ignoreCase = true)) {
-                if (value != null && !value.equals("", ignoreCase = true) && !value.isEmpty()) {
-                    // API Call Confirm Payment
-
-                } else {
-                    // showErrorMsg("Your ticket can not be purchased please try again")
-                }
-            }
-            if (status.equals("exit", ignoreCase = true)) {
-                finish()
-            } else {
-                showToast(status)
-            }
+            // You can control your flow by checking status
         }
-    }*/
+    }
 
 
     /**
