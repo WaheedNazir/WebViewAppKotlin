@@ -1,4 +1,4 @@
-package com.finja.payrollplus.view
+package com.wavetech.webappkotlin.view
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -16,14 +16,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDialog
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.finja.payrollplus.BuildConfig
-import com.finja.payrollplus.R
-import com.finja.payrollplus.utilities.NetworkChangeReceiver
-import com.finja.payrollplus.utilities.NetworkUtils
+import com.wavetech.webappkotlin.BuildConfig
+import com.wavetech.webappkotlin.R
+import com.wavetech.webappkotlin.utilities.NetworkChangeReceiver
+import com.wavetech.webappkotlin.utilities.NetworkUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.general_custom_dialog_network_error.*
 
-class WebViewActivity : AppCompatActivity() {
+open class WebViewActivity : AppCompatActivity() {
 
     private val networkUtils = NetworkUtils()
     private val networkChangeReceiver = NetworkChangeReceiver()
@@ -50,8 +50,8 @@ class WebViewActivity : AppCompatActivity() {
         if (networkUtils.haveNetworkConnection(this@WebViewActivity)) {
             loadWeb(BuildConfig.URL)
         } else {
-            imgv_network_error.setVisibility(View.GONE)
-            webView.setVisibility(View.VISIBLE)
+            imgv_network_error.visibility = View.GONE
+            webView.visibility = View.VISIBLE
             overlayView.visibility = View.VISIBLE
             connectionLostAlert("Quit", BuildConfig.URL)
         }
@@ -60,12 +60,12 @@ class WebViewActivity : AppCompatActivity() {
     /**
      */
     @SuppressLint("SetJavaScriptEnabled", "AddJavascriptInterface", "ClickableViewAccessibility")
-    private fun loadWeb(url: String?) {
-        val webSettings = webView.getSettings()
-        webSettings.setJavaScriptEnabled(true)
-        webSettings.setBuiltInZoomControls(false)
-        webView.setWebViewClient(myWebClient())
-        webView.setWebChromeClient(MyWebChromeClient())
+    private fun loadWeb(url: String) {
+        val webSettings = webView.settings
+        webSettings.javaScriptEnabled = true
+        webSettings.builtInZoomControls = false
+        webView.webViewClient = myWebClient()
+        webView.webChromeClient = MyWebChromeClient()
         webView.addJavascriptInterface(JavaScriptHandler(), "Your_Handler_NAME")
         try {
             webView.loadData("", "text/html", null)
@@ -74,9 +74,9 @@ class WebViewActivity : AppCompatActivity() {
             e.printStackTrace()
         }
 
-        webView.setOnTouchListener { _, event ->
+        webView.setOnTouchListener { _, _ ->
             if (!networkUtils.haveNetworkConnection(this)) {
-                connectionLostAlert("Quit", webView.getUrl())
+                webView.url?.let { connectionLostAlert("Quit", it) }
             }
             false
         }
@@ -94,12 +94,12 @@ class WebViewActivity : AppCompatActivity() {
     inner class myWebClient : WebViewClient() {
         override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
             if (networkUtils.haveNetworkConnection(this@WebViewActivity)) {
-                imgv_network_error.setVisibility(View.GONE)
-                webView.setVisibility(View.VISIBLE)
+                imgv_network_error.visibility = View.GONE
+                webView.visibility = View.VISIBLE
                 overlayView.visibility = View.VISIBLE
                 super.onPageStarted(view, url, favicon)
             } else {
-                webView.setVisibility(View.GONE)
+                webView.visibility = View.GONE
                 imgv_network_error.setVisibility(View.VISIBLE)
                 overlayView.visibility = View.VISIBLE
                 connectionLostAlert("Quit", url)
@@ -108,16 +108,20 @@ class WebViewActivity : AppCompatActivity() {
 
         override fun onPageFinished(view: WebView, url: String) {
             if (networkUtils.haveNetworkConnection(this@WebViewActivity)) {
-                webView.setVisibility(View.VISIBLE)
+                webView.visibility = View.VISIBLE
                 overlayView.visibility = View.GONE
                 super.onPageFinished(view, url)
             }
         }
 
-        override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+        override fun onReceivedError(
+            view: WebView,
+            request: WebResourceRequest,
+            error: WebResourceError
+        ) {
             try {
-                webView.setVisibility(View.GONE)
-                imgv_network_error.setVisibility(View.VISIBLE)
+                webView.visibility = View.GONE
+                imgv_network_error.visibility = View.VISIBLE
                 overlayView.visibility = View.VISIBLE
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -131,7 +135,12 @@ class WebViewActivity : AppCompatActivity() {
      */
     internal inner class MyWebChromeClient : WebChromeClient() {
 
-        override fun onJsConfirm(view: WebView, url: String, message: String, result: JsResult): Boolean {
+        override fun onJsConfirm(
+            view: WebView,
+            url: String,
+            message: String,
+            result: JsResult
+        ): Boolean {
             return super.onJsConfirm(view, url, message, result)
         }
 
@@ -145,7 +154,12 @@ class WebViewActivity : AppCompatActivity() {
             return super.onJsPrompt(view, url, message, defaultValue, result)
         }
 
-        override fun onJsAlert(view: WebView, url: String, message: String, result: JsResult): Boolean {
+        override fun onJsAlert(
+            view: WebView,
+            url: String,
+            message: String,
+            result: JsResult
+        ): Boolean {
             result.confirm()
             if (message.equals("exit", ignoreCase = true)) {
                 finish()
@@ -181,7 +195,7 @@ class WebViewActivity : AppCompatActivity() {
     /**
      * Back Press Alert Dialog
      */
-    fun generalDailog(title: String, message: String) {
+    private fun generalDailog(title: String, message: String) {
         try {
             val builder = AlertDialog.Builder(this@WebViewActivity)
 
@@ -214,13 +228,14 @@ class WebViewActivity : AppCompatActivity() {
 
             if (intent != null && intent.extras != null && !intent.extras!!.isEmpty) {
                 if (!intent.getBooleanExtra("isConnected", false)) {
-                    var url = ""
-                    if (webView.getUrl() == null) {
-                        url = BuildConfig.URL
+                    val url = if (webView.url == null) {
+                        BuildConfig.URL
                     } else {
-                        url = webView.getUrl();
+                        webView.url
                     }
-                    connectionLostAlert("Quit", url)
+                    url?.let { url1 ->
+                        connectionLostAlert("Quit", url1)
+                    }
                 }
             }
         }
@@ -274,17 +289,17 @@ class WebViewActivity : AppCompatActivity() {
 
     /**
      */
-    protected fun isTextEmpty(text: String?): Boolean {
+    private fun isTextEmpty(text: String?): Boolean {
         var result = ""
-        try {
+        return try {
             if (text != null) {
                 result = text.trim { it <= ' ' }
-                return result.isEmpty() || result.equals("null", ignoreCase = true)
+                result.isEmpty() || result.equals("null", ignoreCase = true)
             } else {
-                return true
+                true
             }
         } catch (e: Exception) {
-            return false
+            false
         }
 
     }
@@ -294,7 +309,8 @@ class WebViewActivity : AppCompatActivity() {
      */
     override fun onDestroy() {
         try {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(mNotificationReceiverInternet)
+            LocalBroadcastManager.getInstance(this)
+                .unregisterReceiver(mNotificationReceiverInternet)
             LocalBroadcastManager.getInstance(this).unregisterReceiver(networkChangeReceiver)
         } catch (e: Exception) {
             e.printStackTrace()

@@ -1,11 +1,11 @@
-package com.finja.payrollplus.utilities
+package com.wavetech.webappkotlin.utilities
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.finja.payrollplus.R
+import com.wavetech.webappkotlin.R
 
 class NetworkChangeReceiver : BroadcastReceiver() {
 

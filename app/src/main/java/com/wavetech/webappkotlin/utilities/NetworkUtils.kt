@@ -1,4 +1,4 @@
-package com.finja.payrollplus.utilities
+package com.wavetech.webappkotlin.utilities
 
 import android.content.Context
 import android.net.ConnectivityManager

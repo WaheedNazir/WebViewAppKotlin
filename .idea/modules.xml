@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/73)WebViewAppKotlin.iml" filepath="$PROJECT_DIR$/73)WebViewAppKotlin.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/136)_WebViewAppKotlin.iml" filepath="$PROJECT_DIR$/.idea/modules/136)_WebViewAppKotlin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/136)_WebViewAppKotlin.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/136)_WebViewAppKotlin.app.iml" />
     </modules>
   </component>
 </project>
